@@ -23,13 +23,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
-    backgroundColor: "#25292e",
     padding: 16,
   },
   fab: {
     position: "absolute",
     margin: 16,
-    right: 0,
-    bottom: 0,
+    right: 16,
+    bottom: 16,
   },
 });

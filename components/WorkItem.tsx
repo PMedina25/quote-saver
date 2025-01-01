@@ -30,7 +30,6 @@ export default function WorkItem({ item }: ItemProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#25292e",
     justifyContent: "center",
     alignItems: "center",
     gap: 16,
@@ -39,13 +38,10 @@ const styles = StyleSheet.create({
     height: 40,
     padding: 10,
     marginVertical: 4,
-    color: "#fff",
     borderWidth: 1,
-    borderColor: "#fff",
     borderRadius: 10,
   },
   text: {
     fontSize: 16,
-    color: "#fff",
   },
 });
