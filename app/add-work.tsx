@@ -1,22 +1,32 @@
 import { WorkType } from "@/enums/WorkType";
 import { useNavigation } from "expo-router";
+import { useSQLiteContext } from "expo-sqlite";
 import { useState } from "react";
 import { StyleSheet } from "react-native";
 import { Button, SegmentedButtons, TextInput } from "react-native-paper";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 export default function AddWorkScreen() {
+  const db = useSQLiteContext();
   const navigation = useNavigation();
   const [title, setTitle] = useState<string>("");
-  const [work, setWork] = useState<string>("");
+  const [author, setAuthor] = useState<string>("");
   const [type, setType] = useState<WorkType>(WorkType.Book);
 
-  const handleSubmit = () => {
-    if (!title || !work || !type) {
+  const handleSubmit = async () => {
+    if (!title || !author || !type) {
       return;
     }
 
-    navigation.goBack();
+    try {
+      await db.runAsync(
+        "INSERT INTO works (title, author, type) VALUES (?, ?, ?)",
+        [title, author, type]
+      );
+      navigation.goBack();
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -29,6 +39,13 @@ export default function AddWorkScreen() {
           onChangeText={setTitle}
         />
 
+        <TextInput
+          mode="outlined"
+          label="Author"
+          value={author}
+          onChangeText={setAuthor}
+        />
+
         <SegmentedButtons
           value={type}
           onValueChange={(value: string) => setType(value as WorkType)}
@@ -37,13 +54,6 @@ export default function AddWorkScreen() {
             { value: WorkType.Movie, label: "Movie", icon: "movie" },
             { value: WorkType.Person, label: "Person", icon: "account" },
           ]}
-        />
-
-        <TextInput
-          mode="outlined"
-          label="Work"
-          value={work}
-          onChangeText={setWork}
         />
 
         <Button style={styles.button} mode="contained" onPress={handleSubmit}>
