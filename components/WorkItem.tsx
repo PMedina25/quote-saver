@@ -1,5 +1,7 @@
+import { WorksContext } from "@/context/WorksContext";
 import { Link, RelativePathString } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
+import { useContext } from "react";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
 import {
   GestureHandlerRootView,
@@ -13,7 +15,7 @@ import Reanimated, {
 } from "react-native-reanimated";
 
 type ItemData = {
-  id: string;
+  id: number;
   title: string;
 };
 
@@ -49,9 +51,10 @@ export default function WorkItem({ item }: ItemProps) {
 function RightAction(
   prog: SharedValue<number>,
   drag: SharedValue<number>,
-  itemId: string
+  itemId: number
 ) {
   const db = useSQLiteContext();
+  const { removeWork } = useContext(WorksContext);
 
   const styleAnimation = useAnimatedStyle(() => {
     return {
@@ -62,6 +65,7 @@ function RightAction(
   const handleDelete = async () => {
     try {
       await db.runAsync("DELETE FROM works WHERE id = ?", itemId);
+      removeWork(itemId);
     } catch (error) {
       console.error(error);
     }

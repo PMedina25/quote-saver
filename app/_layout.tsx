@@ -1,3 +1,4 @@
+import { WorksProvider } from "@/context/WorksContext";
 import { migrateDbIfNeeded } from "@/lib/database";
 import { Stack } from "expo-router";
 import { SQLiteProvider } from "expo-sqlite";
@@ -13,11 +14,13 @@ export default function RootLayout() {
           onInit={migrateDbIfNeeded}
           useSuspense
         >
-          <Stack>
-            <Stack.Screen name="index" options={{ title: "Home" }} />
-            <Stack.Screen name="add-work" options={{ title: "Add Work" }} />
-            <Stack.Screen name="[quotes]" options={{ title: "Quotes" }} />
-          </Stack>
+          <WorksProvider>
+            <Stack>
+              <Stack.Screen name="index" options={{ title: "Home" }} />
+              <Stack.Screen name="add-work" options={{ title: "Add Work" }} />
+              <Stack.Screen name="[quotes]" options={{ title: "Quotes" }} />
+            </Stack>
+          </WorksProvider>
         </SQLiteProvider>
       </Suspense>
     </PaperProvider>

@@ -1,35 +1,34 @@
 import WorkItem from "@/components/WorkItem";
+import { WorksContext } from "@/context/WorksContext";
 import { Work } from "@/models/Work";
-import { Link, useFocusEffect } from "expo-router";
+import { Link } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
-import { useCallback, useState } from "react";
+import { useContext, useEffect } from "react";
 import { FlatList, StyleSheet, View } from "react-native";
 import { FAB } from "react-native-paper";
 
 export default function Index() {
   const db = useSQLiteContext();
-  const [works, setWorks] = useState<Work[]>([]);
+  const { works, addWorks } = useContext(WorksContext);
 
-  useFocusEffect(
-    useCallback(() => {
-      async function setup() {
-        try {
-          const result = await db.getAllAsync<Work>("SELECT * FROM works");
-          setWorks(result);
-        } catch (error) {
-          console.error(error);
-        }
+  useEffect(() => {
+    async function setup() {
+      try {
+        const result = await db.getAllAsync<Work>("SELECT * FROM works");
+        addWorks(result);
+      } catch (error) {
+        console.error(error);
       }
-      setup();
-    }, [])
-  );
+    }
+    setup();
+  }, []);
 
   return (
     <View style={styles.container}>
       <FlatList
         data={works}
         renderItem={({ item }) => <WorkItem item={item} />}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.id.toString()}
       />
 
       <Link href="/add-work" style={styles.fab}>
