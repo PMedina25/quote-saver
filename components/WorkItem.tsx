@@ -1,5 +1,15 @@
 import { Link, RelativePathString } from "expo-router";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
+import {
+  GestureHandlerRootView,
+  Pressable,
+} from "react-native-gesture-handler";
+import ReanimatedSwipeable from "react-native-gesture-handler/ReanimatedSwipeable";
+import { Icon, MD3Colors } from "react-native-paper";
+import Reanimated, {
+  SharedValue,
+  useAnimatedStyle,
+} from "react-native-reanimated";
 
 type ItemData = {
   id: string;
@@ -11,19 +21,43 @@ type ItemProps = {
 };
 
 export default function WorkItem({ item }: ItemProps) {
-  console.log(item);
   return (
-    <Link
-      href={{
-        pathname: `/${item.id}` as RelativePathString,
-        params: { id: item.id },
-      }}
-      style={styles.item}
-    >
-      <TouchableOpacity>
-        <Text style={styles.text}>{item.title}</Text>
-      </TouchableOpacity>
-    </Link>
+    <GestureHandlerRootView>
+      <ReanimatedSwipeable
+        friction={2}
+        enableTrackpadTwoFingerGesture
+        rightThreshold={40}
+        renderRightActions={RightAction}
+      >
+        <Link
+          href={{
+            pathname: `/${item.id}` as RelativePathString,
+            params: { id: item.id },
+          }}
+          style={styles.item}
+        >
+          <TouchableOpacity>
+            <Text style={styles.text}>{item.title}</Text>
+          </TouchableOpacity>
+        </Link>
+      </ReanimatedSwipeable>
+    </GestureHandlerRootView>
+  );
+}
+
+function RightAction(prog: SharedValue<number>, drag: SharedValue<number>) {
+  const styleAnimation = useAnimatedStyle(() => {
+    return {
+      transform: [{ translateX: drag.value + 50 }],
+    };
+  });
+
+  return (
+    <Reanimated.View style={styleAnimation}>
+      <Pressable style={styles.rightAction}>
+        <Icon source="delete" color={MD3Colors.neutralVariant100} size={20} />
+      </Pressable>
+    </Reanimated.View>
   );
 }
 
@@ -36,12 +70,16 @@ const styles = StyleSheet.create({
   },
   item: {
     height: 40,
-    padding: 10,
-    marginVertical: 4,
-    borderWidth: 1,
-    borderRadius: 10,
+    padding: 6,
   },
   text: {
     fontSize: 16,
+  },
+  rightAction: {
+    justifyContent: "center",
+    alignItems: "center",
+    width: 50,
+    height: "100%",
+    backgroundColor: MD3Colors.error50,
   },
 });
