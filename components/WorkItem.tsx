@@ -1,4 +1,5 @@
 import { Link, RelativePathString } from "expo-router";
+import { useSQLiteContext } from "expo-sqlite";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
 import {
   GestureHandlerRootView,
@@ -27,7 +28,7 @@ export default function WorkItem({ item }: ItemProps) {
         friction={2}
         enableTrackpadTwoFingerGesture
         rightThreshold={40}
-        renderRightActions={RightAction}
+        renderRightActions={(prog, drag) => RightAction(prog, drag, item.id)}
       >
         <Link
           href={{
@@ -45,16 +46,30 @@ export default function WorkItem({ item }: ItemProps) {
   );
 }
 
-function RightAction(prog: SharedValue<number>, drag: SharedValue<number>) {
+function RightAction(
+  prog: SharedValue<number>,
+  drag: SharedValue<number>,
+  itemId: string
+) {
+  const db = useSQLiteContext();
+
   const styleAnimation = useAnimatedStyle(() => {
     return {
       transform: [{ translateX: drag.value + 50 }],
     };
   });
 
+  const handleDelete = async () => {
+    try {
+      await db.runAsync("DELETE FROM works WHERE id = ?", itemId);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <Reanimated.View style={styleAnimation}>
-      <Pressable style={styles.rightAction}>
+      <Pressable style={styles.rightAction} onPress={handleDelete}>
         <Icon source="delete" color={MD3Colors.neutralVariant100} size={20} />
       </Pressable>
     </Reanimated.View>
