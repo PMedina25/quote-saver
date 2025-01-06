@@ -1,3 +1,4 @@
+import { QuotesProvider } from "@/context/QuotesContext";
 import { WorksProvider } from "@/context/WorksContext";
 import { migrateDbIfNeeded } from "@/lib/database";
 import { Stack } from "expo-router";
@@ -15,11 +16,17 @@ export default function RootLayout() {
           useSuspense
         >
           <WorksProvider>
-            <Stack>
-              <Stack.Screen name="index" options={{ title: "Home" }} />
-              <Stack.Screen name="add-work" options={{ title: "Add Work" }} />
-              <Stack.Screen name="[quotes]" options={{ title: "Quotes" }} />
-            </Stack>
+            <QuotesProvider>
+              <Stack>
+                <Stack.Screen name="index" options={{ title: "Home" }} />
+                <Stack.Screen name="add-work" options={{ title: "Add Work" }} />
+                <Stack.Screen
+                  name="add-quote"
+                  options={{ title: "Add Quote" }}
+                />
+                <Stack.Screen name="[quotes]" options={{ title: "Quotes" }} />
+              </Stack>
+            </QuotesProvider>
           </WorksProvider>
         </SQLiteProvider>
       </Suspense>

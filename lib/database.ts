@@ -14,6 +14,7 @@ export async function migrateDbIfNeeded(db: SQLiteDatabase) {
     await db.execAsync(`
   PRAGMA journal_mode = 'wal';
   CREATE TABLE works (id INTEGER PRIMARY KEY NOT NULL, title TEXT NOT NULL, author TEXT NOT NULL, type TEXT NOT NULL);
+  CREATE TABLE quotes (id INTEGER PRIMARY KEY NOT NULL, quote TEXT NOT NULL, author TEXT NOT NULL, workId INTEGER NOT NULL, FOREIGN KEY(workId) REFERENCES works(id) ON DELETE CASCADE);
   `);
     currentDbVersion = 1;
   }

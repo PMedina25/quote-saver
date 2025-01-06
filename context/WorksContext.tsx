@@ -29,7 +29,7 @@ export const WorksProvider: React.FC<{ children: ReactNode }> = ({
   };
 
   const addWorks = (works: Work[]) => {
-    setWorks((prevWorks) => [...prevWorks, ...works]);
+    setWorks(works);
   };
 
   const removeWork = (id: number) => {

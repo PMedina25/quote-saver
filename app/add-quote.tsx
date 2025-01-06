@@ -1,35 +1,38 @@
-import { WorksContext } from "@/context/WorksContext";
-import { WorkType } from "@/enums/WorkType";
-import { useNavigation } from "expo-router";
+import { QuotesContext } from "@/context/QuotesContext";
+import { useLocalSearchParams, useNavigation } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import { useContext, useState } from "react";
 import { StyleSheet } from "react-native";
-import { Button, SegmentedButtons, TextInput } from "react-native-paper";
+import { Button, TextInput } from "react-native-paper";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
-export default function AddWorkScreen() {
+export default function AddQuoteScreen() {
   const db = useSQLiteContext();
   const navigation = useNavigation();
-  const { addWork } = useContext(WorksContext);
+  const { id }: { id: string } = useLocalSearchParams();
+  const { addQuote } = useContext(QuotesContext);
 
-  const [title, setTitle] = useState<string>("");
+  const [quote, setQuote] = useState<string>("");
   const [author, setAuthor] = useState<string>("");
-  const [type, setType] = useState<WorkType>(WorkType.Book);
 
   const handleSubmit = async () => {
-    if (!title || !author || !type) {
+    if (!quote || !author) {
       return;
     }
 
     try {
       await db
-        .runAsync("INSERT INTO works (title, author, type) VALUES (?, ?, ?)", [
-          title,
-          author,
-          type,
-        ])
+        .runAsync(
+          "INSERT INTO quotes (quote, author, workId) VALUES (?, ?, ?)",
+          [quote, author, parseInt(id)]
+        )
         .then((result) => {
-          addWork({ id: result.lastInsertRowId, title, author, type });
+          addQuote({
+            id: result.lastInsertRowId,
+            quote,
+            author,
+            workId: parseInt(id),
+          });
         });
       navigation.goBack();
     } catch (error) {
@@ -42,9 +45,9 @@ export default function AddWorkScreen() {
       <SafeAreaView style={styles.container}>
         <TextInput
           mode="outlined"
-          label="Title"
-          value={title}
-          onChangeText={setTitle}
+          label="Quote"
+          value={quote}
+          onChangeText={setQuote}
         />
 
         <TextInput
@@ -52,16 +55,6 @@ export default function AddWorkScreen() {
           label="Author"
           value={author}
           onChangeText={setAuthor}
-        />
-
-        <SegmentedButtons
-          value={type}
-          onValueChange={(value: string) => setType(value as WorkType)}
-          buttons={[
-            { value: WorkType.Book, label: "Book", icon: "book" },
-            { value: WorkType.Movie, label: "Movie", icon: "movie" },
-            { value: WorkType.Person, label: "Person", icon: "account" },
-          ]}
         />
 
         <Button style={styles.button} mode="contained" onPress={handleSubmit}>
